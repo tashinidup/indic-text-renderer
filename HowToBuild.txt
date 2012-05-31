@@ -1,0 +1,52 @@
+1) Install NDK as per the instructions at http://developer.android.com/sdk/ndk/index.html
+
+2)a) Download Freetype from https://github.com/android/platform_external_freetype and extract it to the folder indic-text-android-full\jni\freetype.
+Contents of indic-text-android-full\jni\freetype should look as below:
+-builds
+-include
+-src
+-Android.mk
+..
+
+2)b) Download HarfBuzz from http://anongit.freedesktop.org/git/harfbuzz.git into the folder indic-text-android-full\jni\harfbuzz-ng.
+Contents of indic-text-android-full\jni\harfbuzz-ng should look as below:
+-src
+-test
+-util
+-Android.mk
+..
+
+3) Build harfbuzz-ng (http://wiki.smc.org.in/HarfbuzzTesting) :
+
+You need to install ragel, autoconf, libtool and cairo-devel to build the harfbuzz library on your system. Use your operating system's package manager to install ragel, autoconf, libtool and cairo-devel.
+
+Open CygWin Bash Shell and run the following commands (make sure values specified below correspond to correct directory paths on your machine):
+a) export NDK_PROJECT_PATH=/cygdrive/c/_IISc2/mile_svnrepos/tts/indic-text-android-full/
+b) cd $NDK_PROJECT_PATH/jni/harfbuzz-ng
+c) ./autogen.sh
+d) make 
+e) sudo make install
+
+4) Run ndk-build as below to create the native libraries.
+
+a) export NDK=/cygdrive/c/android-ndk-r8
+b) cd $NDK_PROJECT_PATH
+c) $NDK/ndk-build
+
+5) Copy "Lohit-Kannada.ttf" font file to "/sdcard/Android/data/org.iisc.mile.indictext.android/" folder on your phone/emulator.
+a) Switch to DDMS perspective in Eclipse (Window -> Open Perspective -> Other... -> DDMS).
+b) Under "Devices" view, select your phone/emulator.
+c) Under "File Explorer" view, expand and select "sdcard -> Android -> data".
+d) Click "+" icon to create a "New Folder"
+e) Enter folder name as "org.iisc.mile.indictext.android" and click "OK".
+f) Drag and drop "Lohit-Kannada.ttf" file from "tts\indic-text-android-full\assets" onto the "/sdcard/Android/data/org.iisc.mile.indictext.android/" folder in DDMS perspective.
+
+(If your emulator wasn't created with an SD Card, you can add it as below:
+a) Close emulator if it is already running.
+b) Open "Android SDK and AVD Manager".
+c) Select your emulator and click "Edit"
+d) Under "SD Card -> Size" specify a size for your SD card, say "1024 MiB".
+e) Click "Edit AVD" to save changes.
+f) Start your emulator and follow the steps above to copy the font file to the expected location.)
+
+6) Switch back to Java perspective and run "indic-text-android-full" on your Android phone/emulator.
