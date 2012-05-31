@@ -17,21 +17,50 @@ Contents of indic-text-android-full\jni\harfbuzz-ng should look as below:
 ..
 
 3) Build harfbuzz-ng (http://wiki.smc.org.in/HarfbuzzTesting) :
-
+(This is to generate "jni/harfbuzz-ng/src/hb-version.h" and other required header files)
 You need to install ragel, autoconf, libtool and cairo-devel to build the harfbuzz library on your system. Use your operating system's package manager to install ragel, autoconf, libtool and cairo-devel.
 
 Open CygWin Bash Shell and run the following commands (make sure values specified below correspond to correct directory paths on your machine):
-a) export NDK_PROJECT_PATH=/cygdrive/c/_IISc2/mile_svnrepos/tts/indic-text-android-full/
-b) cd $NDK_PROJECT_PATH/jni/harfbuzz-ng
-c) ./autogen.sh
-d) make 
-e) sudo make install
+	a) export NDK_PROJECT_PATH=/cygdrive/c/indic-text-renderer/
+	b) cd $NDK_PROJECT_PATH/jni/harfbuzz-ng
+	c) ./autogen.sh
+	d) make 
+
+Note:
+i) When running ./autogen.sh on Windows using CygWin Bash shell, you might hit an error as below:
+	./autogen.sh: line 3: $'\r': command not found
+	./autogen.sh: line 6: $'\r': command not found
+	: No such file or directory
+If so, then run the following command to convert autogen.sh file to Unix line ending format, and run "./autogen.sh" again. 
+	dos2unix.exe autogen.sh
+
+ii) The second run of ./autogen.sh will create a shell script by name "configure", and then run "./configure".
+When running "./configure", you might an error as below:
+	...
+	checking for windows.h... yes
+	configure: creating ./config.status
+	.in'ig.status: error: cannot find input file: `
+If yes, then run the following command to convert "configure" shell script to Unix line ending format, and run "./configure" again. 
+	dos2unix.exe -f configure
+
+iii) When running "make", after it builds the files in "jni/harfbuzz-ng/src" directory, 
+it will try to build files in "jni/harfbuzz-ng/util" directory and, might fail with an error as below.
+You can safely ignore these errors and continue with the next step.
+
+make[2]: Leaving directory `/cygdrive/c/indic-text-renderer/jni/harfbuzz-ng/src'
+Making all in util
+make[2]: Entering directory `/cygdrive/c/indic-text-renderer/jni/harfbuzz-ng/util'
+  CXX    options.o
+options.cc: In member function `hb_font_t* font_options_t::get_font() const':
+options.cc:528: error: `_setmode' was not declared in this scope
+options.cc: In member function `FILE* output_options_t::get_file_handle()':
+options.cc:672: error: `_setmode' was not declared in this scope
+make[2]: *** [options.o] Error 1
 
 4) Run ndk-build as below to create the native libraries.
-
-a) export NDK=/cygdrive/c/android-ndk-r8
-b) cd $NDK_PROJECT_PATH
-c) $NDK/ndk-build
+	a) export NDK=/cygdrive/c/android-ndk-r8/
+	b) cd $NDK_PROJECT_PATH
+	c) $NDK/ndk-build
 
 5) Copy "Lohit-Kannada.ttf" font file to "/sdcard/Android/data/org.iisc.mile.indictext.android/" folder on your phone/emulator.
 a) Switch to DDMS perspective in Eclipse (Window -> Open Perspective -> Other... -> DDMS).

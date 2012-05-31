@@ -1,3 +1,8 @@
 .settings/
 bin/
 gen/
+jni/freetype/
+jni/harfbuzz-ng/
+!jni/harfbuzz-ng/Android.mk
+libs/
+obj/
