@@ -68,7 +68,7 @@ b) Under "Devices" view, select your phone/emulator.
 c) Under "File Explorer" view, expand and select "sdcard -> Android -> data".
 d) Click "+" icon to create a "New Folder"
 e) Enter folder name as "org.iisc.mile.indictext.android" and click "OK".
-f) Drag and drop "Lohit-Kannada.ttf" file from "tts\indic-text-android-full\assets" onto the "/sdcard/Android/data/org.iisc.mile.indictext.android/" folder in DDMS perspective.
+f) Drag and drop "Lohit-Kannada.ttf" file from "indic-text-renderer\assets" onto the "/sdcard/Android/data/org.iisc.mile.indictext.android/" folder in DDMS perspective.
 
 (If your emulator wasn't created with an SD Card, you can add it as below:
 a) Close emulator if it is already running.
@@ -78,4 +78,4 @@ d) Under "SD Card -> Size" specify a size for your SD card, say "1024 MiB".
 e) Click "Edit AVD" to save changes.
 f) Start your emulator and follow the steps above to copy the font file to the expected location.)
 
-6) Switch back to Java perspective and run "indic-text-android-full" on your Android phone/emulator.
+6) Switch back to Java perspective and run "indic-text-renderer" on your Android phone/emulator.
