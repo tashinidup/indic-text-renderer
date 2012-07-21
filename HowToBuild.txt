@@ -1,15 +1,15 @@
 1) Install NDK as per the instructions at http://developer.android.com/sdk/ndk/index.html
 
-2)a) Download Freetype from https://github.com/android/platform_external_freetype and extract it to the folder indic-text-android-full\jni\freetype.
-Contents of indic-text-android-full\jni\freetype should look as below:
+2)a) Download Freetype from https://github.com/android/platform_external_freetype and extract it to the folder indic-text-renderer\jni\freetype.
+Contents of indic-text-renderer\jni\freetype should look as below:
 -builds
 -include
 -src
 -Android.mk
 ..
 
-2)b) Download HarfBuzz from http://anongit.freedesktop.org/git/harfbuzz.git into the folder indic-text-android-full\jni\harfbuzz-ng.
-Contents of indic-text-android-full\jni\harfbuzz-ng should look as below:
+2)b) Download HarfBuzz from http://anongit.freedesktop.org/git/harfbuzz.git into the folder indic-text-renderer\jni\harfbuzz-ng.
+Contents of indic-text-renderer\jni\harfbuzz-ng should look as below:
 -src
 -test
 -util
