@@ -1,5 +1,5 @@
 /**
- * Copyright © 2012 Shiva Kumar H R
+ * Copyright ï¿½ 2012 Shiva Kumar H R
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -27,7 +27,8 @@
 
 #include <hb-ft.h>
 
-void draw_bitmap(FT_Bitmap* bitmap, jint xStart, jint yStart, JNIEnv *env, jobject jobj, jobject lock) {
+void draw_bitmap(FT_Bitmap* bitmap, jint xStart, jint yStart, JNIEnv *env,
+		jobject jobj, jobject lock) {
 	jintArray row;
 	jobjectArray ret;
 	int i, j;
@@ -37,21 +38,28 @@ void draw_bitmap(FT_Bitmap* bitmap, jint xStart, jint yStart, JNIEnv *env, jobje
 	jmethodID mid;
 
 	// Create array to send back
+	//for table overflow error minimization
+	(*env)->PushLocalFrame(env, 256);
 	row = (jintArray)(*env)->NewIntArray(env, bitmap->width); //TODO: wouldn't the next call work without this allocation?
-	ret = (jobjectArray)(*env)->NewObjectArray(env, bitmap->rows, (*env)->GetObjectClass(env, row), 0);
+	ret = (jobjectArray)(*env)->NewObjectArray(env, bitmap->rows,
+			(*env)->GetObjectClass(env, row), 0);
+	(*env)->DeleteLocalRef(env, row);
 	for (i = 0; i < bitmap->rows; i++) {
 		row = (jintArray)(*env)->NewIntArray(env, bitmap->width);
 		for (j = 0; j < bitmap->width; j++) {
 			localArrayCopy[0] = (int) bitmap->buffer[i * bitmap->width + j];
-			(*env)->SetIntArrayRegion(env, (jintArray) row, (jsize) j, (jsize) 1, (jint *) localArrayCopy);
+			(*env)->SetIntArrayRegion(env, (jintArray) row, (jsize) j,
+					(jsize) 1, (jint *) localArrayCopy);
 		}
 		(*env)->SetObjectArrayElement(env, ret, i, row);
+		(*env)->DeleteLocalRef(env, row);
 	}
 
 	cls = (*env)->GetObjectClass(env, jobj);
 	mid = (*env)->GetMethodID(env, cls, "drawGlyph", "([[III)V");
 	if (mid == 0) {
-		__android_log_print(2, "drawIndicText:draw_bitmap", "%s", "Can't find method drawGlyph");
+		__android_log_print(2, "drawIndicText:draw_bitmap", "%s",
+				"Can't find method drawGlyph");
 		return;
 	}
 
@@ -59,9 +67,13 @@ void draw_bitmap(FT_Bitmap* bitmap, jint xStart, jint yStart, JNIEnv *env, jobje
 	(*env)->MonitorEnter(env, lock);
 	(*env)->CallVoidMethod(env, jobj, mid, ret, xStart, yStart);
 	(*env)->MonitorExit(env, lock);
+	(*env)->DeleteLocalRef(env, ret);
+	(*env)->DeleteLocalRef(env, cls);
+	(*env)->PopLocalFrame(env, NULL);
 
 	if ((*env)->ExceptionOccurred(env)) {
-		__android_log_print(2, "drawIndicText:draw_bitmap", "%s\n", "error occurred copying array back");
+		__android_log_print(2, "drawIndicText:draw_bitmap", "%s\n",
+				"error occurred copying array back");
 		(*env)->ExceptionDescribe(env);
 		(*env)->ExceptionClear(env);
 	}
@@ -69,8 +81,9 @@ void draw_bitmap(FT_Bitmap* bitmap, jint xStart, jint yStart, JNIEnv *env, jobje
 
 }
 
-void Java_org_iisc_mile_indictext_android_EditIndicText_drawIndicText(JNIEnv* env, jobject thiz,
-		jstring unicodeText, jint xStart, jint yBaseLine, jint charHeight, jobject lock) {
+void Java_org_iisc_mile_indictext_android_EditIndicText_drawIndicText(
+		JNIEnv* env, jobject thiz, jstring unicodeText, jint xStart,
+		jint yBaseLine, jint charHeight, jobject lock) {
 	FT_Library ft_library;
 	FT_Face ft_face;
 
@@ -93,16 +106,19 @@ void Java_org_iisc_mile_indictext_android_EditIndicText_drawIndicText(JNIEnv* en
 	int pen_x;
 	int glyphPosX, glyphPosY;
 
-	fontFilePath = "/sdcard/Android/data/org.iisc.mile.indictext.android/Lohit-Kannada.ttf";
+	fontFilePath =
+			"/sdcard/Android/data/org.iisc.mile.indictext.android/Lohit-Kannada.ttf";
 	text = (*env)->GetStringChars(env, unicodeText, &iscopy);
 	num_chars = (*env)->GetStringLength(env, unicodeText);
 
 	error = FT_Init_FreeType(&ft_library); /* initialize library */
 	if (error) {
-		__android_log_print(6, "drawIndicText", "Error initializing FreeType library\n");
+		__android_log_print(6, "drawIndicText",
+				"Error initializing FreeType library\n");
 		return;
 	}
-	__android_log_print(2, "drawIndicText", "Successfully initialized FreeType library\n");
+	__android_log_print(2, "drawIndicText",
+			"Successfully initialized FreeType library\n");
 
 	error = FT_New_Face(ft_library, fontFilePath, 0, &ft_face); /* create face object */
 	if (error == FT_Err_Unknown_File_Format) {
@@ -114,13 +130,15 @@ void Java_org_iisc_mile_indictext_android_EditIndicText_drawIndicText(JNIEnv* en
 				"The font file could not be opened or read, or it might be broken");
 		return;
 	}
-	__android_log_print(2, "drawIndicText", "Successfully created font-face object\n");
+	__android_log_print(2, "drawIndicText",
+			"Successfully created font-face object\n");
 
 	font = hb_ft_font_create(ft_face, NULL);
 
 	error = FT_Set_Pixel_Sizes(ft_face, 0, charHeight); /* set character size */
 	/* error handling omitted */
-	__android_log_print(2, "drawIndicText", "Successfully set character size to %d\n", charHeight);
+	__android_log_print(2, "drawIndicText",
+			"Successfully set character size to %d\n", charHeight);
 
 	__android_log_print(2, "drawIndicText", "Text being rendered = %s\n", text);
 	slot = ft_face->glyph;
@@ -160,7 +178,8 @@ void Java_org_iisc_mile_indictext_android_EditIndicText_drawIndicText(JNIEnv* en
 		}
 
 		/* now, draw to our target surface (convert position) */
-		draw_bitmap(&slot->bitmap, pen_x + slot->bitmap_left, yBaseLine - slot->bitmap_top, env, thiz, lock);
+		draw_bitmap(&slot->bitmap, pen_x + slot->bitmap_left,
+				yBaseLine - slot->bitmap_top, env, thiz, lock);
 		//glyphPosX = pen_x + glyph_pos[i].x_offset;
 		//glyphPosY = yBaseLine - glyph_pos[i].y_offset;
 		//draw_bitmap(&slot->bitmap, glyphPosX, glyphPosY, env, thiz, lock);
@@ -170,11 +189,12 @@ void Java_org_iisc_mile_indictext_android_EditIndicText_drawIndicText(JNIEnv* en
 		//pen_x += glyph_pos[i].x_advance / 64;
 		__android_log_print(2, "drawIndicText",
 				"\tx_offset = %d\ty_offset = %d\tx_advance = %d\ty_advance = %d\n",
-				glyph_pos[i].x_offset / 64, glyph_pos[i].y_offset / 64, glyph_pos[i].x_advance / 64,
-				glyph_pos[i].y_advance / 64);
+				glyph_pos[i].x_offset / 64, glyph_pos[i].y_offset / 64,
+				glyph_pos[i].x_advance / 64, glyph_pos[i].y_advance / 64);
 		__android_log_print(2, "drawIndicText",
-				"\tbitmap_left = %d\tbitmap_top = %d\tadvance.x = %d\tadvance.y = %d\n", slot->bitmap_left,
-				slot->bitmap_top, slot->advance.x >> 6, slot->advance.y >> 6);
+				"\tbitmap_left = %d\tbitmap_top = %d\tadvance.x = %d\tadvance.y = %d\n",
+				slot->bitmap_left, slot->bitmap_top, slot->advance.x >> 6,
+				slot->advance.y >> 6);
 	}
 
 	hb_buffer_destroy(buffer);
